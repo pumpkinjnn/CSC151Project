@@ -1,0 +1,287 @@
+#lang racket
+(require gigls/unsafe)
+
+
+(define split-num 
+  (lambda (num)
+    (list (quotient num 100)
+          (remainder (quotient num 10) 10)
+          (remainder num 10))
+    )
+  )
+
+
+(define draw-central-circles
+  (lambda (image circle-num left top right bottom)
+    (let* (;[width (/ (image-width image) 5)]
+           ;[height (/ (image-height image) 5)]
+           ;[row (+ left (/ width 2))]
+           ;[col (+ top (/ height 2))]
+           ;[b-dis (/ width 15)]
+           ;[dis (map (l-s * b-dis) (list-take (list 0 1 6 7 11 12 8 9 3 4) (+ c-num 1)))]
+           ;[widths (map (l-s - width) dis)]
+           [x-dis (/ (- right left) circle-num 2)]
+           [y-dis (/ (- bottom top) circle-num 2)]
+           [lefts (map (l-s + left) (map (l-s * x-dis) (iota circle-num)))]
+           [tops  (map (l-s + top) (map (l-s * y-dis) (iota circle-num)))]
+           [widths (map (l-s - (- right left)) (map (l-s * (* x-dis 2)) (iota circle-num)))]
+           [heights (map (l-s - (- bottom top)) (map (l-s * (* y-dis 2)) (iota circle-num)))]
+           ;[heights (map (l-s - height) dis)]
+           [draw-one-circle! (lambda (l t width height)
+                               (image-select-ellipse! image REPLACE 
+                                                      l t width height)
+                               (image-stroke-selection! image)
+                               (image-select-nothing! image)
+                               )])
+      (for-each draw-one-circle! lefts tops widths heights)
+      )
+    
+    )
+  
+  )
+
+(define draw-pos-triangle
+  (lambda (image width height)
+    (let ([central-col (/ (image-width image)2)]
+          [central-row (/ (image-height image)2)]
+          [unit-angle (/ (* pi 2) 3)]
+          [start-angle (/ pi 2)])
+      ;   (let kernel ([line-so-far 0]
+      ;                )
+      ;                (if (= line-so-far num)
+      ;                    (image-refresh-display! image)
+      (image-draw-line! image  central-col ;col1 row1 col2 row2
+                        (- central-row (* (/ height 2)))
+                        (+ central-col (* (/ width 2) (cos (+ start-angle unit-angle))));zuoxia
+                        (- central-row (* (/ height 2) (sin (+ start-angle unit-angle)))));zuoxia
+      (image-draw-line! image (- central-col (* (/ width 2) (cos (+ start-angle unit-angle))));youxia
+                          (- central-row (* (/ height 2) (sin (+ start-angle unit-angle))));youxia
+                          (+ central-col (* (/ width 2) (cos (+ start-angle unit-angle))));zuoxia
+                         (- central-row (* (/ height 2) (sin (+ start-angle unit-angle)))));zuoxia
+      (image-draw-line! image  
+                         (- central-col (* (/ width 2) (cos (+ start-angle unit-angle))));youxia
+                         (- central-row (* (/ height 2) (sin (+ start-angle unit-angle))));youxia
+                         central-col ;col1 row1 col2 row2
+                         (- central-row (* (/ height 2))));zuoxia
+    )))
+
+(define draw-neg-triangle
+  (lambda (image width height)
+    (let ([central-col (/ (image-width image)2)]
+          [central-row (/ (image-height image)2)]
+          [unit-angle (/ (* pi 2) 3)]
+          [start-angle (/ pi 2)])
+      ;   (let kernel ([line-so-far 0]
+      ;                )
+      ;                (if (= line-so-far num)
+      ;                    (image-refresh-display! image)
+      (image-draw-line! image  central-col ;col1 row1 col2 row2
+                        (+ central-row (* (/ height 2)))
+                        (- central-col (* (/ width 2) (cos (+ start-angle unit-angle))));zuoxia
+                        (+ central-row (* (/ height 2) (sin (+ start-angle unit-angle)))));zuoxia
+      (image-draw-line! image (+ central-col (* (/ width 2) (cos (+ start-angle unit-angle))));youxia
+                          (+ central-row (* (/ height 2) (sin (+ start-angle unit-angle))));youxia
+                          (- central-col (* (/ width 2) (cos (+ start-angle unit-angle))));zuoxia
+                         (+ central-row (* (/ height 2) (sin (+ start-angle unit-angle)))));zuoxia
+      (image-draw-line! image  
+                         (+ central-col (* (/ width 2) (cos (+ start-angle unit-angle))));youxia
+                         (+ central-row (* (/ height 2) (sin (+ start-angle unit-angle))));youxia
+                         central-col ;col1 row1 col2 row2
+                         (+ central-row (* (/ height 2))));zuoxia
+    )))
+
+(define 25-num
+  (lambda ()
+    (let kernel ([list-so-far '()]
+                 [n 25])
+      (cond [(< n 1)
+          list-so-far]
+          [else (kernel (cons (random 25) list-so-far)
+          (- n 1))])
+    
+    ))
+  )
+
+(define star-col1 (25-num))
+(define star-row1 (25-num))
+(define star-col2 (25-num))
+(define star-row2 (25-num))
+
+(define draw-bg
+  (lambda (image color)
+       (let* ([bgcolor (irgb (- (irgb-red color) 50)
+                             (- (irgb-green color) 50)
+                             (- (irgb-blue color) 50))]
+              [bgcolor2 (irgb (- (irgb-red color) 240)
+                             (- (irgb-green color) 240)
+                             (- (irgb-blue color) 240))]
+              [icolor (irgb-complement bgcolor)]
+              [innercolor (irgb (- (irgb-red icolor) 50)
+                             (- (irgb-green icolor) 50)
+                             (- (irgb-blue icolor) 50))]
+              [center-col (/ (image-width image) 2)]
+              [center-row (/ (image-height image) 2)]
+              [h-axis (/ (image-width image) 5)]
+              [v-axis (/ (image-width image) 10)]
+              [a h-axis]
+              [b v-axis]
+              [r1 (lambda (x y) (floor (/ (* 1.1 a) (sqrt (- 1 (* (- 1 (sqr (/ (* 1.1 a) (* 1.1 b))))
+                                                          (/ (sqr (- y center-row))
+                                                             (+ (sqr (- x center-col))
+                                                                (sqr (- y center-row))))))))))]
+              [r2 (lambda (x y) (floor (/ (* 2 a) (sqrt (- 1 (* (- 1 (sqr (/ (* 2 a) (* 2 b))))
+                                                          (/ (sqr (- y center-row))
+                                                             (+ (sqr (- x center-col))
+                                                                (sqr (- y center-row))))))))))]
+              [r3 (lambda (x y) (floor (/ (* 0.9 a) (sqrt (- 1 (* (- 1 (sqr (/ (* 0.9 a) (* 0.9 b))))
+                                                          (/ (sqr (- y center-row))
+                                                             (+ (sqr (- x center-col))
+                                                                (sqr (- y center-row))))))))))]
+              
+         [bg (image-compute
+          (lambda (x y)
+            (cond 
+              [(and (> (+ (/ (sqr(- x center-col)) (sqr (* 2 a)))
+                      (/ (sqr(- y center-row)) (sqr (* 2 b)))) 1)
+                        (or (not (= x center-col)) (not (= y center-row))))
+                   (irgb (* (irgb-red bgcolor2) (+ 1 (sin (/ (sqrt (+ (sqr (- x center-col)) (sqr (- y center-row)))) (/ a 3)))))
+                         (* (irgb-green bgcolor2) (+ 1 (sin (/ (sqrt (+ (sqr (- x center-col)) (sqr (- y center-row)))) (/ a 3)))))
+                         (* (irgb-blue bgcolor2) (+ 1 (sin (/ (sqrt (+ (sqr (- x center-col)) (sqr (- y center-row)))) (/ a 3))))))
+                   
+                   ]
+              [(and (> (+ (/ (sqr(- x center-col)) (sqr h-axis))
+                      (/ (sqr(- y center-row)) (sqr v-axis))) 1)
+                    (<= (+ (/ (sqr(- x center-col)) (sqr (* 2 a)))
+                      (/ (sqr(- y center-row)) (sqr (* 2 b)))) 1)
+                        (or (not (= x center-col)) (not (= y center-row))))
+                   (irgb (- (irgb-red bgcolor) 
+                            (* (/ (- (sqrt (+ (sqr (- x center-col)) 
+                                           (sqr (- y center-row))))
+                                     (r1 x y))
+                                  (- (r2 x y) (r1 x y)))
+                               (irgb-red bgcolor)))
+                         (- (irgb-green bgcolor) 
+                            (* (/ (- (sqrt (+ (sqr (- x center-col)) 
+                                           (sqr (- y center-row))))
+                                     (r1 x y))
+                                  (- (r2 x y) (r1 x y)))
+                               (irgb-green bgcolor)))
+                         (- (irgb-blue bgcolor) 
+                            (* (/ (- (sqrt (+ (sqr (- x center-col)) 
+                                           (sqr (- y center-row))))
+                                     (r1 x y))
+                                  (- (r2 x y) (r1 x y)))
+                               (irgb-blue bgcolor))))
+                   
+                   ]
+                  [(and (<= (+ (/ (sqr(- x center-col)) (sqr h-axis))
+                      (/ (sqr(- y center-row)) (sqr v-axis))) 1)
+                        (or (not (= x center-col)) (not (= y center-row))))
+                   (irgb (+ (irgb-red innercolor) 
+                            (* (/ (sqrt (+ (sqr (- x center-col)) 
+                                           (sqr (- y center-row)))) 
+                                  (r3 x y))
+                               (- (irgb-red bgcolor) (irgb-red innercolor))))
+                         (+ (irgb-green innercolor) 
+                            (* (/ (sqrt (+ (sqr (- x center-col)) 
+                                           (sqr (- y center-row)))) 
+                                  (r3 x y))
+                               (- (irgb-green bgcolor) (irgb-green innercolor))))
+                         (+ (irgb-blue innercolor) 
+                            (* (/ (sqrt (+ (sqr (- x center-col)) 
+                                           (sqr (- y center-row)))) 
+                                  (r3 x y))
+                               (- (irgb-blue bgcolor) (irgb-blue innercolor)))))
+                   
+                   ]
+                  [else innercolor]
+                  
+                  ))
+          (image-width image) (image-height image)
+          )]
+         
+         )
+         (image-copy-paste-block! bg 0 0 image 0 0 (image-width image) (image-height image))
+         )
+    
+  ))
+
+
+(define draw-magic-circle12
+  (lambda (num width height)
+    (let* ([nums (split-num num)]
+          [fnum (car nums)]
+          [snum (cadr nums)]
+          [tnum (caddr nums)]
+          [image (image-new width height)]
+          [shorter (min width height)]
+          [unit-width (/ width 10)]
+          [unit-height (/ height 10)]
+          [widths (list-take (map (l-s * unit-width) (list 3 5 0 8 2 6 1 7 3 5)) (+ 1 snum))]
+          [heights (list-take (map (l-s * unit-height)(list 1 1 2 2 3 3 5 5 7 7)) (+ 1 snum))]
+          
+          )
+      (context-set-fgcolor! "black")
+      (image-select-all! image)
+      (image-fill-selection! image)
+      (image-select-nothing! image)
+      (draw-bg image (irgb 255 255 255))
+      (draw-pos-triangle image width height)
+      (draw-neg-triangle image width height)
+      (context-set-fgcolor! "white")
+      (for-each image-blot! (make-list 25 image)
+                            (map ceiling (map (l-s * (/ width 25)) star-col2))
+                            (map ceiling (map (l-s * (/ height 25)) star-row2)))
+      (for-each image-blot! (make-list 25 image)
+                            (map ceiling (map (l-s * (/ width 25)) star-col1))
+                            (map ceiling (map (l-s * (/ height 25)) star-row1)))
+      (context-set-fgcolor! 16448210)
+      (context-set-brush! "Nova")
+  ;    (context-set-fgcolor! (irgb 0 170 100))
+      (image-select-ellipse! image REPLACE 
+            (* 0.1 width) (* 0.1 height) (* 0.8 width) (* 0.8 height))
+      (image-stroke-selection! image)
+     ; (image-select-ellipse! image REPLACE 
+      ;      (* 0.2 width) (* 0.2 height) (* 0.6 width) (* 0.6 height))
+      ;(context-set-fgcolor! "gold")
+      ;(image-stroke-selection! image)
+      (image-select-ellipse! image REPLACE 
+            (* 0.11 width) (* 0.11 height) (* 0.78 width) (* 0.78 height))
+      ;(context-set-fgcolor! "goldenrod")
+      (image-stroke-selection! image)
+      (image-select-ellipse! image REPLACE 
+            (* 0.12 width) (* 0.12 height) (* 0.76 width) (* 0.76 height))
+
+      (image-stroke-selection! image)
+      (image-select-ellipse! image REPLACE 
+            (* 0.13 width) (* 0.13 height) (* 0.74 width) (* 0.74 height))
+      (image-stroke-selection! image)
+      (image-select-ellipse! image REPLACE 
+            (* 0.14 width) (* 0.14 height) (* 0.72 width) (* 0.72 height))
+      (image-stroke-selection! image)
+      (image-select-ellipse! image REPLACE 
+            (* 0.15 width) (* 0.15 height) (* 0.7 width) (* 0.7 height))
+      (image-stroke-selection! image)
+      (context-set-brush! "Nova")
+  ;    (context-set-fgcolor! (irgb 0 170 100))
+      (draw-central-circles image tnum (* 0.4 width) (* 0.4 height)
+                            (* 0.6 width) (* 0.6 height))
+     ; (context-set-fgcolor! (irgb 0 170 100))
+      (for-each draw-pos-triangle (make-list snum image) (map  (l-s * width) (map (r-s / 10) (iota snum)))
+                                                 (map  (l-s * height) (map (r-s / 10) (iota snum))))
+      (for-each draw-neg-triangle (make-list fnum image) (map  (l-s * width) (map (r-s / 10) (iota fnum)))
+                                                 (map  (l-s * height) (map (r-s / 10) (iota fnum))))
+     
+      (draw-pos-triangle image (* 0.9 width) (* 0.9 height))
+      (draw-neg-triangle image (* 0.9 width) (* 0.9 height))
+      (draw-central-circles image tnum (* 0.45 width) 0 (* 0.55 width) (* 0.1 height))
+      (draw-central-circles image tnum (* 0.85 width) (* 0.68 height)(* 0.95 width) (* 0.78 height))
+      (draw-central-circles image tnum (* 0.05 width) (* 0.68 height)(* 0.15 width) (* 0.78 height))
+      (image-refresh-display! image)
+      (image-show image)
+      )
+    
+    
+    )
+  )
+
