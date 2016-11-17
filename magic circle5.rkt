@@ -253,6 +253,139 @@
   )))
 
 
+(define roman-num
+  (lambda (image h k R ratio num)
+    (let* ([urow (- k (/ R 1.5))]
+           [lrow (+ k (/ R 1.5))]
+           [cols (map (l-s + h) (map (r-s * (/ (* R 0.8) 3)) (map (r-s - 3)(iota 7))))]
+           [my-cols (map (l-s + (* h (- 1 ratio))) (map (l-s * ratio) cols))])
+      (cond [(= num 0)
+             (image-draw-line! image (list-ref my-cols 1)
+                                     urow
+                                     (list-ref my-cols 5)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 1)
+                                     lrow
+                                     (list-ref my-cols 5)
+                                     urow)]
+            [(= num 1)
+             (image-draw-line! image (list-ref my-cols 3)
+                                     urow
+                                     (list-ref my-cols 3)
+                                     lrow)]
+            [(= num 2)
+             (image-draw-line! image (list-ref my-cols 2)
+                                     urow
+                                     (list-ref my-cols 2)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 4)
+                                     urow
+                                     (list-ref my-cols 4)
+                                     lrow)]
+            [(= num 3)
+             (image-draw-line! image (list-ref my-cols 1)
+                                     urow
+                                     (list-ref my-cols 1)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 3)
+                                     urow
+                                     (list-ref my-cols 3)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 5)
+                                     urow
+                                     (list-ref my-cols 5)
+                                     lrow)]
+            [(= num 4)
+             (image-draw-line! image (list-ref my-cols 1)
+                                     urow
+                                     (list-ref my-cols 1)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 2)
+                                     urow
+                                     (list-ref my-cols 3)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 4)
+                                     urow
+                                     (list-ref my-cols 3)
+                                     lrow)]
+            [(= num 5)
+             (image-draw-line! image (list-ref my-cols 1)
+                                     urow
+                                     (list-ref my-cols 3)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 5)
+                                     urow
+                                     (list-ref my-cols 3)
+                                     lrow)]
+            [(= num 6)
+             (image-draw-line! image (list-ref my-cols 1)
+                                     urow
+                                     (list-ref my-cols 2)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 3)
+                                     urow
+                                     (list-ref my-cols 2)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 4)
+                                     urow
+                                     (list-ref my-cols 4)
+                                     lrow)]
+            [(= num 7)
+             (image-draw-line! image (list-ref my-cols 1)
+                                     urow
+                                     (list-ref my-cols 2)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 3)
+                                     urow
+                                     (list-ref my-cols 2)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 4)
+                                     urow
+                                     (list-ref my-cols 4)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 5)
+                                     urow
+                                     (list-ref my-cols 5)
+                                     lrow)]
+            [(= num 8)
+             (image-draw-line! image (list-ref my-cols 0)
+                                     urow
+                                     (list-ref my-cols 1)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 2)
+                                     urow
+                                     (list-ref my-cols 1)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 3)
+                                     urow
+                                     (list-ref my-cols 3)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 4)
+                                     urow
+                                     (list-ref my-cols 4)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 5)
+                                     urow
+                                     (list-ref my-cols 5)
+                                     lrow)]
+            [(= num 9)
+             (image-draw-line! image (list-ref my-cols 2)
+                                     urow
+                                     (list-ref my-cols 2)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 3)
+                                     urow
+                                     (list-ref my-cols 5)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 3)
+                                     lrow
+                                     (list-ref my-cols 5)
+                                     urow)])
+      
+      )
+  ))
+
+
 (define draw-magic-circle5
   (lambda (num width height)
    (let* ([nums (split-num num)]
@@ -284,7 +417,10 @@
                             (map ceiling (map (l-s * (/ width 25)) star-col2))
                             (map ceiling (map (l-s * (/ height 25)) star-row2)))
       
-      
+     
+      (context-set-fgcolor! "black")
+      (context-set-brush! "2. Block 01")
+      (roman-num image c-col c-row  (/ VR 2) ratio tnum)
      
       (context-set-fgcolor! fgcolor)
      
