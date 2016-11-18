@@ -438,7 +438,7 @@
       
       (context-set-brush! "Nova")
       (draw-poly image c-col c-row (/ (* 0.7 height) 2) (+ fnum 3) (* snum (/ in* 20)) ratio)
-      
+      (roman-num image c-col (- c-row (/ VR 2)) (/ VR 20) ratio snum)
      
      
       (image-refresh-display! image)
