@@ -207,7 +207,7 @@
   ))
 
 
-(define draw-magic-circle2
+(define draw-magic-circle3
   (lambda (num width height)
     (let* ([nums (split-num num)]
           [fnum (car nums)]
@@ -225,9 +225,8 @@
       (image-select-all! image)
       (image-fill-selection! image)
       (image-select-nothing! image)
-      (draw-bg image (irgb 255 255 255))
+      (draw-bg image 9662683)
       (draw-pos-triangle image width height)
-      (draw-neg-triangle image width height)
       (context-set-fgcolor! "white")
       (for-each image-blot! (make-list 25 image)
                             (map ceiling (map (l-s * (/ width 25)) star-col2))
@@ -237,9 +236,10 @@
                             (map ceiling (map (l-s * (/ height 25)) star-row1)))
       (context-set-fgcolor! 16448210)
       (context-set-brush! "Nova")
-  ;    (context-set-fgcolor! (irgb 0 170 100))
+      (context-set-fgcolor! "mediumpurple")
       (image-select-ellipse! image REPLACE 
             (* 0.1 width) (* 0.1 height) (* 0.8 width) (* 0.8 height))
+      (context-set-fgcolor! "mediumpurple")
       (image-stroke-selection! image)
      ; (image-select-ellipse! image REPLACE 
       ;      (* 0.2 width) (* 0.2 height) (* 0.6 width) (* 0.6 height))
@@ -263,10 +263,10 @@
             (* 0.15 width) (* 0.15 height) (* 0.7 width) (* 0.7 height))
       (image-stroke-selection! image)
       (context-set-brush! "Nova")
-  ;    (context-set-fgcolor! (irgb 0 170 100))
+      (context-set-fgcolor! "mediumpurple")
       (draw-central-circles image tnum (* 0.4 width) (* 0.4 height)
                             (* 0.6 width) (* 0.6 height))
-     ; (context-set-fgcolor! (irgb 0 170 100))
+      (context-set-fgcolor! "purple")
       (for-each draw-pos-triangle (make-list snum image) (map  (l-s * width) (map (r-s / 10) (iota snum)))
                                                  (map  (l-s * height) (map (r-s / 10) (iota snum))))
       (for-each draw-neg-triangle (make-list fnum image) (map  (l-s * width) (map (r-s / 10) (iota fnum)))

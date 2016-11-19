@@ -1,0 +1,104 @@
+#lang racket
+
+(define game
+  (lambda (x width height)
+    (cond [(= x 0)
+           (draw-magic-circle1 311 width height)]
+          [(or (= x 311) 
+               (= x 324)
+               (= x 339)
+               (= x 356)
+               (= x 375)
+               (= x 396)
+               (= x 419)
+               (= x 444)
+               (= x 471))
+           (draw-magic-circle1 (+ 275 (sqr (+ 5 (+ 1 (- (sqrt (- x 275)) 5))))) width height)]
+          
+          [(= x 500)
+           (draw-magic-circle2 28 width height)]
+          
+          [(or (= x 28)
+               (= x 66)
+               (= x 114)
+               (= x 172)
+               (= x 240)
+               (= x 318)
+               (= x 406)
+               (= x 504)
+               (= x 612))
+           (draw-magic-circle2 (* 5 (- (sqr (+ 2.3 (+ 1 (- (sqrt (+ (/ x 5) 5.29)) 2.3)))) 5.29)) width height)]
+          
+          [(= x 730)
+           (draw-magic-circle3 841 width height)]
+          
+          [(= x 841)
+           (draw-magic-circle3 909 width height)]
+          [(= x 909)
+           (draw-magic-circle3 141 width height)]
+          [(= x 141)
+           (draw-magic-circle3 756 width height)]
+          [(= x 756)
+           (draw-magic-circle3 958 width height)]
+          [(= x 958)
+           (draw-magic-circle3 279 width height)]
+          [(= x 279)
+           (draw-magic-circle3 656 width height)]
+          [(= x 656)
+           (draw-magic-circle3 989 width height)]
+          [(= x 989)
+           (draw-magic-circle3 412 width height)]
+          [(= x 412)
+           (draw-magic-circle3 544 width height)]
+             
+          
+           [(= x 544)
+           (draw-magic-circle4 17 width height)]
+           
+          [(or (= x 17)
+               (= x 49)
+               (= x 97)
+               (= x 161)
+               (= x 241)
+               (= x 337)
+               (= x 433)
+               (= x 545)
+               (= x 657))
+           (draw-magic-circle4 (+ 1 (* 16 (expt (+ 1 (expt (/ (- x 1) 16) (/ 1 1.7))) 1.7))) width height)]
+          
+            [(= x 801)
+           (draw-magic-circle5 540 width height)]
+          
+            
+          [(= x 540)
+           (draw-magic-circle5 416 width height)]
+          [(= x 416)
+           (draw-magic-circle5 989 width height)]
+          [(= x 989)
+           (draw-magic-circle5 653 width height)]
+          [(= x 653)
+           (draw-magic-circle5 283 width height)]
+          [(= x 283)
+           (draw-magic-circle5 960 width height)]
+          [(= x 960)
+           (draw-magic-circle5 753 width height)]
+          [(= x 753)
+           (draw-magic-circle5 145 width height)]
+          [(= x 145)
+           (draw-magic-circle5 911 width height)]
+          [(= x 911)
+           (draw-magic-circle5 839 width height)]
+          
+          [(= x 839)
+           (define source (image-load "/home/chenziwe/Desktop/project/zhihuishu.jpg"))
+           (define target (image-new width height))
+           (image-copy-paste-block! 
+            source 0 0 
+            target 0 0 width height)]
+          
+          
+          [else (draw-tree x width height)]
+          )
+    
+    
+    ))
