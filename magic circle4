@@ -203,82 +203,8 @@
                    (image-stroke-selection! image)
                     (image-select-nothing! image)]
                  [else (list my-col-point create-row-point)]))))
-;           [in* (/ (* (- m 2) pi) m)]
-;           [r (* 2 R (sin (/ pi m)))]
-;           [s (* r (/ (sin (- in* a)) (sin (- pi in*))))]
-;           [create-point* (lambda (n)
-;                           (cons (+ (car (list-ref create-points n)) 
-;                                    (* s (cos (+ (* 1.5 pi) (- (/ in* 2)) a (* n (- pi in*))))))
-;                                 (- (cdr (list-ref create-points n))
-;                                    (* s (sin (+ (* 1.5 pi) (- (/ in* 2)) a (* n (- pi in*))))))))]
-;           [create-points* (map create-point* (iota m))]
-;           [my-points* (let kernel ([i 0]
-;                                   [cur-points '()]
-;                                       )
-;                        (cond [(>= i m)
-;                               (reverse cur-points)]
-;                            [else
-;                             (kernel (+ i 1)
-;                              (cons (cons (+ (* h (- 1 ratio)) (* (car (list-ref create-points* i)) ratio)) 
-;                                           (cdr (list-ref create-points* i)))
-;                                  cur-points
-;                                   ))]
-;                            )
-;                        )]
-;           )
-;      ;(display create-points*)
-;      ;(display my-points*)
-;    (image-select-polygon! image REPLACE my-points)
-;    (image-stroke-selection! image)
-;    (image-select-nothing! image)
-;    (let kernel2 ([i 0])
-;        (when (< i m)
-;          (image-draw-line! image (car (list-ref my-points i))
-;                                  (cdr (list-ref my-points i))
-;                                  (car (list-ref my-points* i))
-;                                  (cdr (list-ref my-points* i)))
-;          (kernel2 (+ i 1))
-;      ))
-;      (let kernel3 ([i 0])
-;        (when (< i m)
-;          (image-draw-line! image (car (list-ref my-points i))
-;                                  (cdr (list-ref my-points i))
-;                                  (/ (+ (car (list-ref my-points* (remainder (+ i 1) m)))
-;                                     (car (list-ref my-points (remainder (+ i 1) m)))) 2)
-;                                  (/ (+ (cdr (list-ref my-points* (remainder (+ i 1) m)))
-;                                     (cdr (list-ref my-points (remainder (+ i 1) m)))) 2))
-;          (kernel3 (+ i 1))
-;      ))
-;      (let kernel4 ([i 0])
-;        (when (< i m)
-;          (image-draw-line! image (car (list-ref my-points i))
-;                                  (cdr (list-ref my-points i))
-;                                  (/ (+ (/ (+ (car (list-ref my-points* i))
-;                                     (car (list-ref my-points i))) 2)
-;                                     (car (list-ref my-points (mod (- i 1) m)))) 2)
-;                                  (/ (+ (/ (+ (cdr (list-ref my-points* i))
-;                                     (cdr (list-ref my-points i))) 2)
-;                                     (cdr (list-ref my-points (mod (- i 1) m)))) 2))
-;          (kernel4 (+ i 1))
-;      ))
-;      (let kernel5 ([i 0])
-;        (when (< i m)
-;          (image-draw-line! image (/ (+ (/ (+ (car (list-ref my-points* i))
-;                                     (car (list-ref my-points i))) 2)
-;                                     (car (list-ref my-points (mod (- i 1) m)))) 2)
-;                                  (/ (+ (/ (+ (cdr (list-ref my-points* i))
-;                                     (cdr (list-ref my-points i))) 2)
-;                                     (cdr (list-ref my-points (mod (- i 1) m)))) 2)
-;                                  (/ (+ (car (list-ref my-points i)) 
-;                                     (car (list-ref my-points (mod (- i 1) m)))) 2)
-;                                  (/ (+ (cdr (list-ref my-points i)) 
-;                                     (cdr (list-ref my-points (mod (- i 1) m)))) 2))
-;          (kernel5 (+ i 1))
-;      ))
-  
-  
 
-
+  
 
 (define roman-num
   (lambda (image h k R ratio num)
@@ -459,13 +385,7 @@
       (image-select-ellipse! image REPLACE (* 0.1 width) (* 0.1 height) HR VR)
       (image-stroke-selection! image)
       (image-select-nothing! image)
-     
-      
-      ;(context-set-brush! "GIMP Brush #1")
-      ;(image-select-ellipse! image REPLACE (* 0.14 width) (* 0.14 height) (* HR 0.9) (* VR 0.9))
-      ;(image-stroke-selection! image)
-      ;(image-select-nothing! image)
-      
+           
       (context-set-brush! "Nova")
       (draw-pentagon image c-col c-row (* 0.4 width) ratio #t (/ pi 2))
       (draw-pentagon image c-col c-row (* (* 0.4 width) (sin (*(/ 54 180) pi))) ratio #t (/ (* 3 pi) 2))
@@ -473,21 +393,22 @@
                         inner-pentagon-col inner-pentagon-row 
                         (append (list (list-ref outer-pentagon-col 3) (list-ref outer-pentagon-col 4)) (list-take outer-pentagon-col 3))
                         (append (list (list-ref outer-pentagon-row 3) (list-ref outer-pentagon-row 4))(list-take outer-pentagon-row 3)))
-     (for-each draw-central-circles (make-list 5 image) (make-list 5 tnum)
+     (for-each draw-central-circles (make-list 5 image) (make-list 5 2)
                                     (map (r-s - (* width 0.03)) inner-pentagon-col)
                                     (map (r-s - (* height 0.03)) inner-pentagon-row)
                                     (map (r-s + (* width 0.03)) inner-pentagon-col)
                                     (map (r-s + (* height 0.03))inner-pentagon-row))
-     (for-each draw-central-circles (make-list 5 image) (make-list 5 tnum)
+     (for-each draw-central-circles (make-list 5 image) (make-list 5 fnum)
                                     (map (r-s - (* width 0.05)) outer-pentagon-col)
                                     (map (r-s - (* height 0.05)) outer-pentagon-row)
                                     (map (r-s + (* width 0.05)) outer-pentagon-col)
                                     (map (r-s + (* height 0.05)) outer-pentagon-row))
      
-     (draw-central-circles image snum (- c-col (* 0.1 width))
+     (draw-central-circles image tnum (- c-col (* 0.1 width))
                                       (- c-row (* 0.1 height))
                                       (+ c-col (* 0.1 width))
                                       (+ c-row (* 0.1 height)))
+     (roman-num image (* 0.5 width) (* 0.9 height) (* 0.03 (+ width height)) ratio snum) 
       (image-refresh-display! image)
       (image-show image)
      )
