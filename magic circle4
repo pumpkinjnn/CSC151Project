@@ -11,102 +11,6 @@
   )
 
 
-(define draw-central-circles
-  (lambda (image circle-num left top right bottom)
-    (let* (;[width (/ (image-width image) 5)]
-           ;[height (/ (image-height image) 5)]
-           ;[row (+ left (/ width 2))]
-           ;[col (+ top (/ height 2))]
-           ;[b-dis (/ width 15)]
-           ;[dis (map (l-s * b-dis) (list-take (list 0 1 6 7 11 12 8 9 3 4) (+ c-num 1)))]
-           ;[widths (map (l-s - width) dis)]
-           [x-dis (/ (- right left) circle-num 2)]
-           [y-dis (/ (- bottom top) circle-num 2)]
-           [lefts (map (l-s + left) (map (l-s * x-dis) (iota circle-num)))]
-           [tops  (map (l-s + top) (map (l-s * y-dis) (iota circle-num)))]
-           [widths (map (l-s - (- right left)) (map (l-s * (* x-dis 2)) (iota circle-num)))]
-           [heights (map (l-s - (- bottom top)) (map (l-s * (* y-dis 2)) (iota circle-num)))]
-           ;[heights (map (l-s - height) dis)]
-           [draw-one-circle! (lambda (l t width height)
-                               (image-select-ellipse! image REPLACE 
-                                                      l t width height)
-                               (image-stroke-selection! image)
-                               (image-select-nothing! image)
-                               )])
-      (for-each draw-one-circle! lefts tops widths heights)
-      )
-    
-    )
-  
-  )
-
-(define draw-pos-triangle
-  (lambda (image width height)
-    (let ([central-col (/ (image-width image)2)]
-          [central-row (/ (image-height image)2)]
-          [unit-angle (/ (* pi 2) 3)]
-          [start-angle (/ pi 2)])
-      ;   (let kernel ([line-so-far 0]
-      ;                )
-      ;                (if (= line-so-far num)
-      ;                    (image-refresh-display! image)
-      (image-draw-line! image  central-col ;col1 row1 col2 row2
-                        (- central-row (* (/ height 2)))
-                        (+ central-col (* (/ width 2) (cos (+ start-angle unit-angle))));zuoxia
-                        (- central-row (* (/ height 2) (sin (+ start-angle unit-angle)))));zuoxia
-      (image-draw-line! image (- central-col (* (/ width 2) (cos (+ start-angle unit-angle))));youxia
-                          (- central-row (* (/ height 2) (sin (+ start-angle unit-angle))));youxia
-                          (+ central-col (* (/ width 2) (cos (+ start-angle unit-angle))));zuoxia
-                         (- central-row (* (/ height 2) (sin (+ start-angle unit-angle)))));zuoxia
-      (image-draw-line! image  
-                         (- central-col (* (/ width 2) (cos (+ start-angle unit-angle))));youxia
-                         (- central-row (* (/ height 2) (sin (+ start-angle unit-angle))));youxia
-                         central-col ;col1 row1 col2 row2
-                         (- central-row (* (/ height 2))));zuoxia
-    )))
-
-(define draw-neg-triangle
-  (lambda (image width height)
-    (let ([central-col (/ (image-width image)2)]
-          [central-row (/ (image-height image)2)]
-          [unit-angle (/ (* pi 2) 3)]
-          [start-angle (/ pi 2)])
-      ;   (let kernel ([line-so-far 0]
-      ;                )
-      ;                (if (= line-so-far num)
-      ;                    (image-refresh-display! image)
-      (image-draw-line! image  central-col ;col1 row1 col2 row2
-                        (+ central-row (* (/ height 2)))
-                        (- central-col (* (/ width 2) (cos (+ start-angle unit-angle))));zuoxia
-                        (+ central-row (* (/ height 2) (sin (+ start-angle unit-angle)))));zuoxia
-      (image-draw-line! image (+ central-col (* (/ width 2) (cos (+ start-angle unit-angle))));youxia
-                          (+ central-row (* (/ height 2) (sin (+ start-angle unit-angle))));youxia
-                          (- central-col (* (/ width 2) (cos (+ start-angle unit-angle))));zuoxia
-                         (+ central-row (* (/ height 2) (sin (+ start-angle unit-angle)))));zuoxia
-      (image-draw-line! image  
-                         (+ central-col (* (/ width 2) (cos (+ start-angle unit-angle))));youxia
-                         (+ central-row (* (/ height 2) (sin (+ start-angle unit-angle))));youxia
-                         central-col ;col1 row1 col2 row2
-                         (+ central-row (* (/ height 2))));zuoxia
-    )))
-
-(define 25-num
-  (lambda ()
-    (let kernel ([list-so-far '()]
-                 [n 25])
-      (cond [(< n 1)
-          list-so-far]
-          [else (kernel (cons (random 25) list-so-far)
-          (- n 1))])
-    
-    ))
-  )
-
-(define star-col1 (25-num))
-(define star-row1 (25-num))
-(define star-col2 (25-num))
-(define star-row2 (25-num))
-
 (define draw-bg
   (lambda (image color)
        (let* ([bgcolor (irgb (- (irgb-red color) 50)
@@ -205,125 +109,386 @@
          )
     
   ))
-(define turtle-lines
-  (lambda (image num brush)
-    (letrec ([turtle-list (lambda (num)
-                            (if (= num 0)
-                                null
-                                (cons (turtle-new image)
-                                      (turtle-list (- num 1)))))])
-             (let ([angle-list (lambda (num)
-                                  (map (l-s * (/ 360 num)) (iota num )))]
-                   [turtles (turtle-list (* num 5))])
-               (map turtle-set-brush! turtles (make-list (* num 5) brush) ;(make-list (* num 2) 50))
-                    )
-               (map turtle-teleport! turtles (make-list (* num 5) (/ (image-width image) 2))
-                                                      (make-list (* num 5) (/ (image-height image) 2)))
-               (map turtle-face! turtles (map truncate(angle-list (* num 5))))
-               (map turtle-forward! 
-                         turtles 
-                         (map (l-s + (* 0.1 (sqrt(+(expt (image-width image) 2)
-                                                         (expt (image-height image) 2)))))
-                                                        (map (l-s *
-                                             (* 0.006(sqrt(+(expt (image-width image) 2)
-                                                      (expt (image-height image) 2))))) (iota (* num 5)))))
-                         ))))
+
+
+(define 25-num
+  (lambda ()
+    (let kernel ([list-so-far '()]
+                 [n 25])
+      (cond [(< n 1)
+          list-so-far]
+          [else (kernel (cons (random 25) list-so-far)
+          (- n 1))])
+    
+    ))
+  )
+
+(define star-col1 (25-num))
+(define star-row1 (25-num))
+(define star-col2 (25-num))
+(define star-row2 (25-num))
+(define draw-central-circles
+  (lambda (image circle-num left top right bottom)
+    (let* ([x-dis (/ (- right left) circle-num 2)]
+           [y-dis (/ (- bottom top) circle-num 2)]
+           [lefts (map (l-s + left) (map (l-s * x-dis) (iota circle-num)))]
+           [tops  (map (l-s + top) (map (l-s * y-dis) (iota circle-num)))]
+           [widths (map (l-s - (- right left)) (map (l-s * (* x-dis 2)) (iota circle-num)))]
+           [heights (map (l-s - (- bottom top)) (map (l-s * (* y-dis 2)) (iota circle-num)))]
+           [draw-one-circle! (lambda (l t width height)
+                               (image-select-ellipse! image REPLACE 
+                                                      l t width height)
+                               (image-stroke-selection! image)
+                               (image-select-nothing! image)
+                               )])
+      (for-each draw-one-circle! lefts tops widths heights)
+      )
+    
+    )
+  
+  )
+
+
+(define generate-color
+  (lambda (num)
+    (cond [(= num 0)
+           (irgb 255 255 255)]
+          [(= num 1)
+           (irgb 255 150 150)]
+          [(= num 2)
+           (irgb 200 200 255)]
+          [(= num 3)
+           (irgb 200 255 200)]
+          [(= num 4)
+           (irgb 230 200 255)]
+          [(= num 5)
+           (irgb 255 255 200)]
+          [(= num 6)
+           (irgb 255 192 203)]
+          [(= num 7)
+           (irgb 200 255 255)]
+          [(= num 8)
+           (irgb 192 203 255)]
+          [(= num 9)
+           (irgb 192 255 203)])
+  
+  ))
+
+(define world (image-new 200 200))
+
+(define draw-pentagon
+  (lambda (image start-col start-row R ratio draw-or-not start-angle)
+    (let* ([in (/ (* 2 pi) 5)]
+           [create-col-point (map (lambda (n)(+ start-col (* R (cos (+ start-angle (* n in)))))) (iota 5))]
+           [create-row-point (map (lambda (n)(- start-row (* R (sin (+ start-angle (* n in)))))) (iota 5))]
+           [variant-col (lambda (n) (+ (* start-col (- 1 ratio)) (* n ratio)))]
+           [create-point (lambda (n)
+                           (cons (+ start-col (* R (cos (+ start-angle (* n in)))))
+                                 (- start-row (* R (sin (+ start-angle (* n in)))))))]
+           [create-points (map create-point (iota 5))]
+           [my-col-point (map variant-col create-col-point)]
+           [my-points (let kernel ([i 0]
+                                   [cur-points '()]
+                                       )
+                        (cond [(>= i 5)
+                               (reverse cur-points)]
+                            [else
+                             (kernel (+ i 1)
+                              (cons (cons (+ (* start-col (- 1 ratio)) (* (car (list-ref create-points i)) ratio)) 
+                                           (cdr (list-ref create-points i)))
+                                  cur-points
+                                   ))]))])
+           (cond [(equal? draw-or-not #t)
+                  (image-select-polygon! image REPLACE my-points)
+                   (image-stroke-selection! image)
+                    (image-select-nothing! image)]
+                 [else (list my-col-point create-row-point)]))))
+;           [in* (/ (* (- m 2) pi) m)]
+;           [r (* 2 R (sin (/ pi m)))]
+;           [s (* r (/ (sin (- in* a)) (sin (- pi in*))))]
+;           [create-point* (lambda (n)
+;                           (cons (+ (car (list-ref create-points n)) 
+;                                    (* s (cos (+ (* 1.5 pi) (- (/ in* 2)) a (* n (- pi in*))))))
+;                                 (- (cdr (list-ref create-points n))
+;                                    (* s (sin (+ (* 1.5 pi) (- (/ in* 2)) a (* n (- pi in*))))))))]
+;           [create-points* (map create-point* (iota m))]
+;           [my-points* (let kernel ([i 0]
+;                                   [cur-points '()]
+;                                       )
+;                        (cond [(>= i m)
+;                               (reverse cur-points)]
+;                            [else
+;                             (kernel (+ i 1)
+;                              (cons (cons (+ (* h (- 1 ratio)) (* (car (list-ref create-points* i)) ratio)) 
+;                                           (cdr (list-ref create-points* i)))
+;                                  cur-points
+;                                   ))]
+;                            )
+;                        )]
+;           )
+;      ;(display create-points*)
+;      ;(display my-points*)
+;    (image-select-polygon! image REPLACE my-points)
+;    (image-stroke-selection! image)
+;    (image-select-nothing! image)
+;    (let kernel2 ([i 0])
+;        (when (< i m)
+;          (image-draw-line! image (car (list-ref my-points i))
+;                                  (cdr (list-ref my-points i))
+;                                  (car (list-ref my-points* i))
+;                                  (cdr (list-ref my-points* i)))
+;          (kernel2 (+ i 1))
+;      ))
+;      (let kernel3 ([i 0])
+;        (when (< i m)
+;          (image-draw-line! image (car (list-ref my-points i))
+;                                  (cdr (list-ref my-points i))
+;                                  (/ (+ (car (list-ref my-points* (remainder (+ i 1) m)))
+;                                     (car (list-ref my-points (remainder (+ i 1) m)))) 2)
+;                                  (/ (+ (cdr (list-ref my-points* (remainder (+ i 1) m)))
+;                                     (cdr (list-ref my-points (remainder (+ i 1) m)))) 2))
+;          (kernel3 (+ i 1))
+;      ))
+;      (let kernel4 ([i 0])
+;        (when (< i m)
+;          (image-draw-line! image (car (list-ref my-points i))
+;                                  (cdr (list-ref my-points i))
+;                                  (/ (+ (/ (+ (car (list-ref my-points* i))
+;                                     (car (list-ref my-points i))) 2)
+;                                     (car (list-ref my-points (mod (- i 1) m)))) 2)
+;                                  (/ (+ (/ (+ (cdr (list-ref my-points* i))
+;                                     (cdr (list-ref my-points i))) 2)
+;                                     (cdr (list-ref my-points (mod (- i 1) m)))) 2))
+;          (kernel4 (+ i 1))
+;      ))
+;      (let kernel5 ([i 0])
+;        (when (< i m)
+;          (image-draw-line! image (/ (+ (/ (+ (car (list-ref my-points* i))
+;                                     (car (list-ref my-points i))) 2)
+;                                     (car (list-ref my-points (mod (- i 1) m)))) 2)
+;                                  (/ (+ (/ (+ (cdr (list-ref my-points* i))
+;                                     (cdr (list-ref my-points i))) 2)
+;                                     (cdr (list-ref my-points (mod (- i 1) m)))) 2)
+;                                  (/ (+ (car (list-ref my-points i)) 
+;                                     (car (list-ref my-points (mod (- i 1) m)))) 2)
+;                                  (/ (+ (cdr (list-ref my-points i)) 
+;                                     (cdr (list-ref my-points (mod (- i 1) m)))) 2))
+;          (kernel5 (+ i 1))
+;      ))
+  
+  
+
+
+
+(define roman-num
+  (lambda (image h k R ratio num)
+    (let* ([urow (- k (/ R 1.5))]
+           [lrow (+ k (/ R 1.5))]
+           [cols (map (l-s + h) (map (r-s * (/ (* R 0.8) 3)) (map (r-s - 3)(iota 7))))]
+           [my-cols (map (l-s + (* h (- 1 ratio))) (map (l-s * ratio) cols))])
+      (cond [(= num 0)
+             (image-draw-line! image (list-ref my-cols 1)
+                                     urow
+                                     (list-ref my-cols 5)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 1)
+                                     lrow
+                                     (list-ref my-cols 5)
+                                     urow)]
+            [(= num 1)
+             (image-draw-line! image (list-ref my-cols 3)
+                                     urow
+                                     (list-ref my-cols 3)
+                                     lrow)]
+            [(= num 2)
+             (image-draw-line! image (list-ref my-cols 2)
+                                     urow
+                                     (list-ref my-cols 2)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 4)
+                                     urow
+                                     (list-ref my-cols 4)
+                                     lrow)]
+            [(= num 3)
+             (image-draw-line! image (list-ref my-cols 1)
+                                     urow
+                                     (list-ref my-cols 1)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 3)
+                                     urow
+                                     (list-ref my-cols 3)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 5)
+                                     urow
+                                     (list-ref my-cols 5)
+                                     lrow)]
+            [(= num 4)
+             (image-draw-line! image (list-ref my-cols 1)
+                                     urow
+                                     (list-ref my-cols 1)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 2)
+                                     urow
+                                     (list-ref my-cols 3)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 4)
+                                     urow
+                                     (list-ref my-cols 3)
+                                     lrow)]
+            [(= num 5)
+             (image-draw-line! image (list-ref my-cols 1)
+                                     urow
+                                     (list-ref my-cols 3)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 5)
+                                     urow
+                                     (list-ref my-cols 3)
+                                     lrow)]
+            [(= num 6)
+             (image-draw-line! image (list-ref my-cols 1)
+                                     urow
+                                     (list-ref my-cols 2)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 3)
+                                     urow
+                                     (list-ref my-cols 2)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 4)
+                                     urow
+                                     (list-ref my-cols 4)
+                                     lrow)]
+            [(= num 7)
+             (image-draw-line! image (list-ref my-cols 1)
+                                     urow
+                                     (list-ref my-cols 2)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 3)
+                                     urow
+                                     (list-ref my-cols 2)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 4)
+                                     urow
+                                     (list-ref my-cols 4)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 5)
+                                     urow
+                                     (list-ref my-cols 5)
+                                     lrow)]
+            [(= num 8)
+             (image-draw-line! image (list-ref my-cols 0)
+                                     urow
+                                     (list-ref my-cols 1)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 2)
+                                     urow
+                                     (list-ref my-cols 1)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 3)
+                                     urow
+                                     (list-ref my-cols 3)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 4)
+                                     urow
+                                     (list-ref my-cols 4)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 5)
+                                     urow
+                                     (list-ref my-cols 5)
+                                     lrow)]
+            [(= num 9)
+             (image-draw-line! image (list-ref my-cols 2)
+                                     urow
+                                     (list-ref my-cols 2)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 3)
+                                     urow
+                                     (list-ref my-cols 5)
+                                     lrow)
+             (image-draw-line! image (list-ref my-cols 3)
+                                     lrow
+                                     (list-ref my-cols 5)
+                                     urow)])
       
+      )
+  ))
 
-(define turtle-hexagon
-  (lambda (turtle distance)
-    (turtle-set-brush! turtle "Nova")
-    (turtle-set-color! turtle (irgb 255 255 255))
-    (turtle-turn! turtle 72)
-    (turtle-forward! turtle distance)))
-(define draw-big-wubianxing
-  (lambda (image left top height width)
-    (let ([turtle (turtle-new image)])
-      (turtle-set-brush! turtle "Nova")
-      (turtle-set-color! turtle (irgb 255 255 255))
-      (turtle-face! turtle 36)
-      (turtle-teleport! turtle (+ left (/ width 2)) top)
-      (repeat 5 (l-s turtle-hexagon turtle) (/ height 2)))))
 
-(define draw-magic-circle3
+(define draw-magic-circle4
   (lambda (num width height)
-    (let* ([nums (split-num num)]
+   (let* ([nums (split-num num)]
           [fnum (car nums)]
           [snum (cadr nums)]
           [tnum (caddr nums)]
           [image (image-new width height)]
-          [shorter (min width height)]
-          [unit-width (/ width 10)]
-          [unit-height (/ height 10)]
-          [widths (list-take (map (l-s * unit-width) (list 3 5 0 8 2 6 1 7 3 5)) (+ 1 snum))]
-          [heights (list-take (map (l-s * unit-height)(list 1 1 2 2 3 3 5 5 7 7)) (+ 1 snum))]
-          
+          [tommy (turtle-new image)]
+          [HR (* 0.8 width)]
+          [VR (* 0.8 height)]
+          [ratio (/ width height)]
+          [c-col (/ width 2)]
+          [c-row (/ height 2)]
+          [fgcolor (generate-color fnum)]
+          [in* (/ (* (+ fnum 1) pi) (+ fnum 3))]
+          [inner-pentagon-col (car (draw-pentagon image c-col c-row (/ (* (* 0.4 width) (sin (*(/ 54 180) pi))) 2) ratio #f (/ pi 3)))]
+          [inner-pentagon-row (cadr (draw-pentagon image c-col c-row (/ (* (* 0.4 width) (sin (*(/ 54 180) pi))) 2) ratio #f (/ pi 3)))]
+          [outer-pentagon-col (car (draw-pentagon image c-col c-row (* 0.4 width) ratio #f (/ pi 2)))]
+          [outer-pentagon-row (cadr (draw-pentagon image c-col c-row (* 0.4 width) ratio #f (/ pi 2)))]
           )
-      (context-set-fgcolor! "black")
-      (image-select-all! image)
-      (image-fill-selection! image)
-      (image-select-nothing! image)
-;      (draw-bg image 9662683)
-;      (draw-pos-triangle image width height)
+     
+      (draw-bg image fgcolor)
+      
+      
+      (context-set-fgcolor! (irgb-lighter (irgb-lighter fgcolor)))
+      (context-set-brush! "Star Brush #2")
+      (for-each image-blot! (make-list 25 image)
+                            (map ceiling (map (l-s * (/ width 25)) star-col1))
+                            (map ceiling (map (l-s * (/ height 25)) star-row1)))
+      
       (context-set-fgcolor! "white")
       (for-each image-blot! (make-list 25 image)
                             (map ceiling (map (l-s * (/ width 25)) star-col2))
                             (map ceiling (map (l-s * (/ height 25)) star-row2)))
-     (for-each image-blot! (make-list 25 image)
-                            (map ceiling (map (l-s * (/ width 25)) star-col1))
-                            (map ceiling (map (l-s * (/ height 25)) star-row1)))
-;      (context-set-fgcolor! 16448210)
-     (context-set-brush! "Nova")
-      (image-select-ellipse! image REPLACE 
-            (* 0.1 width) (* 0.1 height) (* 0.8 width) (* 0.8 height))
+      
+     
+      (context-set-fgcolor! "black")
+      (context-set-brush! "2. Block 01")
+     
+      (context-set-fgcolor! fgcolor)
+     
+     
+      (context-set-brush! "Nova")
+      (image-select-ellipse! image REPLACE (* 0.1 width) (* 0.1 height) HR VR)
       (image-stroke-selection! image)
-     ; (image-select-ellipse! image REPLACE 
-      ;      (* 0.2 width) (* 0.2 height) (* 0.6 width) (* 0.6 height))
-      ;(context-set-fgcolor! "gold")
+      (image-select-nothing! image)
+     
+      
+      ;(context-set-brush! "GIMP Brush #1")
+      ;(image-select-ellipse! image REPLACE (* 0.14 width) (* 0.14 height) (* HR 0.9) (* VR 0.9))
       ;(image-stroke-selection! image)
-;      (image-select-ellipse! image REPLACE 
-;            (* 0.11 width) (* 0.11 height) (* 0.78 width) (* 0.78 height))
-      ;(context-set-fgcolor! "goldenrod")
-;      (image-stroke-selection! image)
-;      (image-select-ellipse! image REPLACE 
-;            (* 0.12 width) (* 0.12 height) (* 0.76 width) (* 0.76 height))
-;
-;      (image-stroke-selection! image)
-;      (image-select-ellipse! image REPLACE 
-;            (* 0.13 width) (* 0.13 height) (* 0.74 width) (* 0.74 height))
-;      (image-stroke-selection! image)
-;      (image-select-ellipse! image REPLACE 
-;            (* 0.14 width) (* 0.14 height) (* 0.72 width) (* 0.72 height))
-;      (image-stroke-selection! image)
-;      (image-select-ellipse! image REPLACE 
-;            (* 0.15 width) (* 0.15 height) (* 0.7 width) (* 0.7 height))
-;      (image-stroke-selection! image)
+      ;(image-select-nothing! image)
       
-       (context-set-brush! "Sparks")
-;      (context-set-fgcolor! "mediumpurple")
-;      (draw-central-circles image tnum (* 0.4 width) (* 0.4 height)
-;                            (* 0.6 width) (* 0.6 height))
-      
-;      (context-set-fgcolor! "purple")
-;      (for-each draw-pos-triangle (make-list snum image) (map  (l-s * width) (map (r-s / 10) (iota snum)))
-;                                                 (map  (l-s * height) (map (r-s / 10) (iota snum))))
-;      (for-each draw-neg-triangle (make-list fnum image) (map  (l-s * width) (map (r-s / 10) (iota fnum)))
-;                                                 (map  (l-s * height) (map (r-s / 10) (iota fnum))))
-;     
-;      (draw-pos-triangle image (* 0.9 width) (* 0.9 height))
-;      (draw-neg-triangle image (* 0.9 width) (* 0.9 height))
-;      (draw-central-circles image tnum (* 0.45 width) 0 (* 0.55 width) (* 0.1 height))
-;      (draw-central-circles image tnum (* 0.85 width) (* 0.68 height)(* 0.95 width) (* 0.78 height))
-;      (draw-central-circles image tnum (* 0.05 width) (* 0.68 height)(* 0.15 width) (* 0.78 height))
-      (turtle-lines image fnum "Nova")
-;      (for-each (l-s turtle-hexagon (turtle-teleport! (turtle-new image) (/ (image-width image)2) (/(image-height image)2))) (map (l-s * (* 0.03 (sqrt(+(expt (image-width image) 2)
- ;(expt (image-height image) 2))))) (map increment(iota fnum))))
-      (draw-big-wubianxing image (* 0.1 width) (* 0.1 height) (* 0.8 width) (* 0.8 height))
+      (context-set-brush! "Nova")
+      (draw-pentagon image c-col c-row (* 0.4 width) ratio #t (/ pi 2))
+      (draw-pentagon image c-col c-row (* (* 0.4 width) (sin (*(/ 54 180) pi))) ratio #t (/ (* 3 pi) 2))
+      (for-each image-draw-line! (make-list 5 image)
+                        inner-pentagon-col inner-pentagon-row 
+                        (append (list (list-ref outer-pentagon-col 3) (list-ref outer-pentagon-col 4)) (list-take outer-pentagon-col 3))
+                        (append (list (list-ref outer-pentagon-row 3) (list-ref outer-pentagon-row 4))(list-take outer-pentagon-row 3)))
+     (for-each draw-central-circles (make-list 5 image) (make-list 5 tnum)
+                                    (map (r-s - (* width 0.03)) inner-pentagon-col)
+                                    (map (r-s - (* height 0.03)) inner-pentagon-row)
+                                    (map (r-s + (* width 0.03)) inner-pentagon-col)
+                                    (map (r-s + (* height 0.03))inner-pentagon-row))
+     (for-each draw-central-circles (make-list 5 image) (make-list 5 tnum)
+                                    (map (r-s - (* width 0.05)) outer-pentagon-col)
+                                    (map (r-s - (* height 0.05)) outer-pentagon-row)
+                                    (map (r-s + (* width 0.05)) outer-pentagon-col)
+                                    (map (r-s + (* height 0.05)) outer-pentagon-row))
+     
+     (draw-central-circles image snum (- c-col (* 0.1 width))
+                                      (- c-row (* 0.1 height))
+                                      (+ c-col (* 0.1 width))
+                                      (+ c-row (* 0.1 height)))
       (image-refresh-display! image)
       (image-show image)
-      )
-    
-    
-    )
-  )
-
+     )
+  ))
