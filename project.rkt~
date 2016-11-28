@@ -1,15 +1,13 @@
 #lang racket
 
 (require gigls/unsafe)
+
 ;;;Procedure:game
 ;;;Parameter:num, an positive integer between 1~999
 ;;;          width, a positive number, width of the image
 ;;;          height, a positive number, height of the image
 ;;;Purpose:  apply the game mechinism to the whole procedure
 ;;;Produce:  nothing
-
-
-
 (define game
   (lambda (x width height)
     (cond [(= x 0)
@@ -37,7 +35,7 @@
                (= x 406)
                (= x 504)
                (= x 612))
-           (draw-magic-circle2 (* 5 (- (sqr (+ 2.3 (+ 1 (- (sqrt (+ (/ x 5) 5.29)) 2.3)))) 5.29)) width height)]
+           (draw-magic-circle2 (round (* 5 (- (sqr (+ 2.3 (+ 1 (- (sqrt (+ (/ x 5) 5.29)) 2.3)))) 5.29))) width height)]
           
           [(= x 730)
            (draw-magic-circle3 841 width height)]
@@ -66,15 +64,15 @@
            (draw-magic-circle4 17 width height)]
            
           [(or (= x 17)
-               (= x 49)
-               (= x 97)
-               (= x 161)
-               (= x 241)
+               (= x 53)
+               (= x 104)
+               (= x 169)
+               (= x 247)
                (= x 337)
-               (= x 433)
-               (= x 545)
-               (= x 657))
-           (draw-magic-circle4 (+ 1 (* 16 (expt (+ 1 (expt (/ (- x 1) 16) (/ 1 1.7))) 1.7))) width height)]
+               (= x 438)
+               (= x 549)
+               (= x 670))
+           (draw-magic-circle4 (floor (+ 1 (* 16 (expt (+ 1 (expt (/ (- x 1) 16) (/ 1 1.7))) 1.7)))) width height)]
           
             [(= x 801)
            (draw-magic-circle5 540 width height)]
@@ -83,8 +81,8 @@
           [(= x 540)
            (draw-magic-circle5 416 width height)]
           [(= x 416)
-           (draw-magic-circle5 989 width height)]
-          [(= x 989)
+           (draw-magic-circle5 979 width height)]
+          [(= x 979)
            (draw-magic-circle5 653 width height)]
           [(= x 653)
            (draw-magic-circle5 283 width height)]
@@ -100,11 +98,12 @@
            (draw-magic-circle5 839 width height)]
           
           [(= x 839)
-           (define source (image-load "/home/chenziwe/Desktop/project/zhihuishu.jpg"))
+           (define source (image-load "/home/chenziwe/Desktop/project/titus.jpg"))
            (define target (image-new width height))
            (image-copy-paste-block! 
             source 0 0 
-            target 0 0 width height)]
+            target 0 0 width height)
+           (image-show target)]
           
           
           [else (draw-tree x width height)]
@@ -767,7 +766,7 @@
       (image-select-all! image)
       (image-fill-selection! image)
       (image-select-nothing! image)
-      (draw-bg image (irgb 200 100 0))
+      (draw-bg image (color-name->irgb "palegoldenrod"))
       (draw-star image width height)
       (context-set-fgcolor! "white")
       (for-each image-blot! (make-list 25 image)
@@ -777,7 +776,7 @@
                             (map ceiling (map (l-s * (/ width 25)) star-col1))
                             (map ceiling (map (l-s * (/ height 25)) star-row1)))
       
-      (context-set-fgcolor! "orange")
+      (context-set-fgcolor! "palegoldenrod")
       (context-set-brush! "Nova")
       (image-select-ellipse! image REPLACE 
             (* 0.1 width) (* 0.1 height) (* 0.8 width) (* 0.8 height))
@@ -1067,7 +1066,7 @@
       (image-select-all! image)
       (image-fill-selection! image)
       (image-select-nothing! image)
-      (draw-bg image 9662683)
+      (draw-bg image  (generate-color fnum))
       (draw-pos-triangle image width height)
       (context-set-fgcolor! "white")
       (for-each image-blot! (make-list 25 image)
@@ -1076,12 +1075,11 @@
       (for-each image-blot! (make-list 25 image)
                             (map ceiling (map (l-s * (/ width 25)) star-col1))
                             (map ceiling (map (l-s * (/ height 25)) star-row1)))
-      (context-set-fgcolor! 16448210)
       (context-set-brush! "Nova")
-      (context-set-fgcolor! "mediumpurple")
+      (context-set-fgcolor! (generate-color fnum))
       (image-select-ellipse! image REPLACE 
             (* 0.1 width) (* 0.1 height) (* 0.8 width) (* 0.8 height))
-      (context-set-fgcolor! "mediumpurple")
+      (context-set-fgcolor! (generate-color fnum))
       (image-stroke-selection! image)
 
       (image-select-ellipse! image REPLACE 
@@ -1103,14 +1101,13 @@
       (image-stroke-selection! image)
       (image-select-nothing! image)
       (context-set-brush! "Nova")
-      (context-set-fgcolor! "mediumpurple")
-      (context-set-fgcolor! "purple")
+      (context-set-fgcolor! (generate-color fnum))
       (cond [(not (= 0 tnum))
-      (for-each draw-pos-triangle (make-list tnum image) (map  (l-s * width) (map (r-s / 10) (iota tnum)))
-                                                 (map  (l-s * height) (map (r-s / 10) (iota tnum))))])
+      (for-each draw-pos-triangle (make-list tnum image) (map  (l-s * width) (map (r-s / 10) (map increment (iota tnum))))
+                                                 (map  (l-s * height) (map (r-s / 10) (map increment (iota tnum)))))])
       (cond [(not (= 0 snum))
-      (for-each draw-neg-triangle (make-list snum image) (map  (l-s * width) (map (r-s / 10) (iota snum)))
-                                                 (map  (l-s * height) (map (r-s / 10) (iota snum))))])
+      (for-each draw-neg-triangle (make-list snum image) (map  (l-s * width) (map (r-s / 10) (map increment (iota snum))))
+                                                 (map  (l-s * height) (map (r-s / 10) (map increment (iota snum)))))])
      
       (draw-pos-triangle image (* 0.9 width) (* 0.9 height))
       (draw-neg-triangle image (* 0.9 width) (* 0.9 height))
@@ -1234,14 +1231,14 @@
                                     (map (r-s - (* height 0.03)) inner-pentagon-row)
                                     (map (r-s + (* width 0.03)) inner-pentagon-col)
                                     (map (r-s + (* height 0.03))inner-pentagon-row))
-         (cond [(not (= 0 tnum))
-           (for-each draw-central-circles (make-list 5 image) (make-list 5 tnum)
-                                    (map (r-s - (* width 0.05)) outer-pentagon-col)
-                                    (map (r-s - (* height 0.05)) outer-pentagon-row)
-                                    (map (r-s + (* width 0.05)) outer-pentagon-col)
-                                    (map (r-s + (* height 0.05)) outer-pentagon-row))])
-      (cond [(not (= 0 snum))
-       (draw-central-circles image snum (- c-col (* 0.1 width))
+         (cond [(not (= 0 snum))
+           (for-each draw-central-circles (make-list 5 image) (make-list 5 snum)
+                                    (map (r-s - (* width 0.06)) outer-pentagon-col)
+                                    (map (r-s - (* height 0.06)) outer-pentagon-row)
+                                    (map (r-s + (* width 0.06)) outer-pentagon-col)
+                                    (map (r-s + (* height 0.06)) outer-pentagon-row))])
+      (cond [(not (= 0 tnum))
+       (draw-central-circles image tnum (- c-col (* 0.1 width))
                                         (- c-row (* 0.1 height))
                                         (+ c-col (* 0.1 width))
                                         (+ c-row (* 0.1 height)))])

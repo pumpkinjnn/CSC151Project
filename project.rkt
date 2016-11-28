@@ -1,15 +1,13 @@
 #lang racket
 
 (require gigls/unsafe)
+
 ;;;Procedure:game
 ;;;Parameter:num, an positive integer between 1~999
 ;;;          width, a positive number, width of the image
 ;;;          height, a positive number, height of the image
 ;;;Purpose:  apply the game mechinism to the whole procedure
 ;;;Produce:  nothing
-
-
-
 (define game
   (lambda (x width height)
     (cond [(= x 0)
@@ -100,7 +98,7 @@
            (draw-magic-circle5 839 width height)]
           
           [(= x 839)
-           (define source (image-load "/home/chenziwe/Desktop/project/zhihuishu.jpg"))
+           (define source (image-load "/home/chenziwe/Desktop/project/titus.jpg"))
            (define target (image-new width height))
            (image-copy-paste-block! 
             source 0 0 
@@ -768,7 +766,7 @@
       (image-select-all! image)
       (image-fill-selection! image)
       (image-select-nothing! image)
-      (draw-bg image (irgb 200 100 0))
+      (draw-bg image (color-name->irgb "palegoldenrod"))
       (draw-star image width height)
       (context-set-fgcolor! "white")
       (for-each image-blot! (make-list 25 image)
@@ -778,7 +776,7 @@
                             (map ceiling (map (l-s * (/ width 25)) star-col1))
                             (map ceiling (map (l-s * (/ height 25)) star-row1)))
       
-      (context-set-fgcolor! "orange")
+      (context-set-fgcolor! "palegoldenrod")
       (context-set-brush! "Nova")
       (image-select-ellipse! image REPLACE 
             (* 0.1 width) (* 0.1 height) (* 0.8 width) (* 0.8 height))
@@ -1068,7 +1066,7 @@
       (image-select-all! image)
       (image-fill-selection! image)
       (image-select-nothing! image)
-      (draw-bg image 9662683)
+      (draw-bg image  (generate-color fnum))
       (draw-pos-triangle image width height)
       (context-set-fgcolor! "white")
       (for-each image-blot! (make-list 25 image)
@@ -1077,12 +1075,11 @@
       (for-each image-blot! (make-list 25 image)
                             (map ceiling (map (l-s * (/ width 25)) star-col1))
                             (map ceiling (map (l-s * (/ height 25)) star-row1)))
-      (context-set-fgcolor! 16448210)
       (context-set-brush! "Nova")
-      (context-set-fgcolor! "mediumpurple")
+      (context-set-fgcolor! (generate-color fnum))
       (image-select-ellipse! image REPLACE 
             (* 0.1 width) (* 0.1 height) (* 0.8 width) (* 0.8 height))
-      (context-set-fgcolor! "mediumpurple")
+      (context-set-fgcolor! (generate-color fnum))
       (image-stroke-selection! image)
 
       (image-select-ellipse! image REPLACE 
@@ -1104,8 +1101,7 @@
       (image-stroke-selection! image)
       (image-select-nothing! image)
       (context-set-brush! "Nova")
-      (context-set-fgcolor! "mediumpurple")
-      (context-set-fgcolor! "purple")
+      (context-set-fgcolor! (generate-color fnum))
       (cond [(not (= 0 tnum))
       (for-each draw-pos-triangle (make-list tnum image) (map  (l-s * width) (map (r-s / 10) (map increment (iota tnum))))
                                                  (map  (l-s * height) (map (r-s / 10) (map increment (iota tnum)))))])
